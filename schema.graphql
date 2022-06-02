@@ -1,0 +1,75 @@
+type Detris @entity {
+  id:                           ID!
+  address:                      Bytes!
+  name:                         String!
+  symbol:                       String!
+  mintPrice:                    BigInt!
+  maxSupply:                    BigInt!
+  currentSupply:                BigInt!
+  assets:                       [Asset!]! @derivedFrom(field: "organization")
+  createdAt:                    BigInt!
+  updatedAt:                    BigInt!
+
+}
+
+type Asset @entity {
+  id:                           ID!
+  tokenId:                      BigInt!
+  contractAddress:              Bytes!
+  owner:                        Bytes!
+  transfers:                    [Transfer!]! @derivedFrom(field: "asset")
+  minter:                       Bytes!
+  organization:                   Detris
+  URI:                          String
+}
+
+
+type Account @entity {
+  id:                           ID! # ETH addr
+  address:                      Bytes!
+  balances:                     [Balance!]! @derivedFrom(field: "account")
+  transfersFrom:                [Transfer!]! @derivedFrom(field: "from")
+  transfersTo:                  [Transfer!]! @derivedFrom(field: "to")
+  timestamp:                    BigInt!
+}
+
+type Transfer  @entity {
+  id:                           ID!
+  transaction:                  Transaction!
+  timestamp:                    BigInt!
+  asset:                        Asset!
+  from:                         Account!
+  fromBalance:                  Balance
+  to:                           Account!
+  toBalance:                    Balance
+  value:                        BigInt!
+  type:                         String!
+}
+
+type Balance @entity {
+  id:                           ID!
+  asset:                        Asset!
+  account:                      Account!
+  value:                        BigInt!
+}
+
+enum DetrisStatus @entity {
+  pending
+  ongoing
+  sold
+}
+
+type Transaction @entity {
+  id:                           ID!
+  timestamp:                    BigInt!
+  blockNumber:                  BigInt!
+  events:                       [Event!]! @derivedFrom(field: "transaction")
+}
+
+
+interface Event {
+  id:                           ID!
+  type:                         String!
+  transaction:                  Transaction!
+  timestamp:                    BigInt!
+}
